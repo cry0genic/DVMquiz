@@ -37,8 +37,7 @@ class Question(models.Model):
         ('1', 'pool_1'),
         ('2', 'pool_2'),
         ('3', 'pool_3'),
-        ('4', 'pool_4'),
-        ('5', 'pool_5')
+        #add more pools if required
     )
 
     # Question content --

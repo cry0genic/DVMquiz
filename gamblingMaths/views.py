@@ -20,9 +20,9 @@ import random
 def generate_keys():
     key_list = []
 
-    y = random.randint(0, 11)
+    y = random.randint(0, 2) #change acc to number of questions
     while True:
-        z = random.randint(0,11)
+        z = random.randint(0, 2) #change acc to number of questions
         if z == y:
             continue
         else:
@@ -79,12 +79,12 @@ def generate_questions(request):
     if current_member.questions_generated:
         pass
     else:
-        for x in range(0, 5):
+        for x in range(0, 2): #change acc to number of quetions/pools
             questions = Question.objects.filter(pool=x + 1)
             print(questions)
             rand_list = generate_keys()
             print(rand_list)
-            # Generate a list of two *different* random integers between 1 and 19, both inclusive.
+            # Generate a list of two *different* random integers between a and b, both inclusive.
             for y in range(2):
                 question = MemberQuestion.objects.create(
                     index=y + x * 2,
@@ -167,168 +167,168 @@ def set_uncertainty(request):
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-@csrf_exempt
-def add_to_review(request):
-    current_member = Member.objects.get(user=request.user)
-    if request.method == "POST":
-        queskey = request.POST.get("queskey")
-        question = Question.objects.get(questionkey=queskey)
+# @csrf_exempt
+# def add_to_review(request):
+#     current_member = Member.objects.get(user=request.user)
+#     if request.method == "POST":
+#         queskey = request.POST.get("queskey")
+#         question = Question.objects.get(questionkey=queskey)
 
-        if current_member.questions_attempted.filter(questionkey=queskey).exists():
-            current_member.questions_attempted.remove(question)
-        if current_member.not_attempted.filter(questionkey=queskey).exists():
-            current_member.not_attempted.remove(question)
-        if current_member.ar_questions.filter(questionkey=queskey).exists():
-            current_member.ar_questions.remove(question)
+#         if current_member.questions_attempted.filter(questionkey=queskey).exists():
+#             current_member.questions_attempted.remove(question)
+#         if current_member.not_attempted.filter(questionkey=queskey).exists():
+#             current_member.not_attempted.remove(question)
+#         if current_member.ar_questions.filter(questionkey=queskey).exists():
+#             current_member.ar_questions.remove(question)
 
-        current_member.marked_for_review.add(question)
+#         current_member.marked_for_review.add(question)
 
-        return HttpResponse(
-            "Question marked for review"
-        )  # This needs to be changed later
-    else:
-        q = current_member.marked_for_review.all()
-        atrlist = []
-        for question in q:
-            atrlist.append(question.questionkey)
-        data = {"atrlist": atrlist}
-        return JsonResponse(data)
-
-
-@csrf_exempt
-def add_to_not_attempted(request):
-    current_member = Member.objects.get(user=request.user)
-    if request.method == "POST":
-        queskey = request.POST.get("queskey")
-        question = Question.objects.get(questionkey=queskey)
-        # To make sure that a question does not appear in attempted and not attempted both.
-        if current_member.questions_attempted.filter(questionkey=queskey).exists():
-            current_member.questions_attempted.remove(question)
-        if current_member.marked_for_review.filter(questionkey=queskey).exists():
-            current_member.marked_for_review.remove(question)
-        if current_member.ar_questions.filter(questionkey=queskey).exists():
-            current_member.ar_questions.remove(question)
-
-        current_member.not_attempted.add(question)
-
-        return HttpResponse(
-            "Question added to not attempted"
-        )  # This needs to be changed later
-    else:
-        q = current_member.not_attempted.all()
-        atnalist = []
-        for question in q:
-            atnalist.append(question.questionkey)
-        data = {"atnalist": atnalist}
-        return JsonResponse(data)
+#         return HttpResponse(
+#             "Question marked for review"
+#         )  # This needs to be changed later
+#     else:
+#         q = current_member.marked_for_review.all()
+#         atrlist = []
+#         for question in q:
+#             atrlist.append(question.questionkey)
+#         data = {"atrlist": atrlist}
+#         return JsonResponse(data)
 
 
-@csrf_exempt
-def add_to_attempted(request):
-    current_member = Member.objects.get(user=request.user)
-    if request.method == "POST":
-        queskey = request.POST.get("queskey")
-        question = Question.objects.get(questionkey=queskey)
-        # To make sure that a question does not appear in attempted and not attempted both.
-        if current_member.marked_for_review.filter(questionkey=queskey).exists():
-            current_member.marked_for_review.remove(question)
-        if current_member.not_attempted.filter(questionkey=queskey).exists():
-            current_member.not_attempted.remove(question)
-        if current_member.ar_questions.filter(questionkey=queskey).exists():
-            current_member.ar_questions.remove(question)
+# @csrf_exempt
+# def add_to_not_attempted(request):
+#     current_member = Member.objects.get(user=request.user)
+#     if request.method == "POST":
+#         queskey = request.POST.get("queskey")
+#         question = Question.objects.get(questionkey=queskey)
+#         # To make sure that a question does not appear in attempted and not attempted both.
+#         if current_member.questions_attempted.filter(questionkey=queskey).exists():
+#             current_member.questions_attempted.remove(question)
+#         if current_member.marked_for_review.filter(questionkey=queskey).exists():
+#             current_member.marked_for_review.remove(question)
+#         if current_member.ar_questions.filter(questionkey=queskey).exists():
+#             current_member.ar_questions.remove(question)
 
-        current_member.questions_attempted.add(question)
+#         current_member.not_attempted.add(question)
 
-        return HttpResponse(
-            "Question added to attempted"
-        )  # This needs to be changed later
-    else:
-        q = current_member.questions_attempted.all()
-        atalist = []
-        for question in q:
-            atalist.append(question.questionkey)
-        data = {"atalist": atalist}
-        return JsonResponse(data)
+#         return HttpResponse(
+#             "Question added to not attempted"
+#         )  # This needs to be changed later
+#     else:
+#         q = current_member.not_attempted.all()
+#         atnalist = []
+#         for question in q:
+#             atnalist.append(question.questionkey)
+#         data = {"atnalist": atnalist}
+#         return JsonResponse(data)
 
 
-@csrf_exempt
-def add_to_ar(request):
-    current_member = Member.objects.get(user=request.user)
-    if request.method == "POST":
-        queskey = request.POST.get("queskey")
-        question = Question.objects.get(questionkey=queskey)
-        # To make sure that a question does not appear in attempted and not attempted both.
-        if current_member.marked_for_review.filter(questionkey=queskey).exists():
-            current_member.marked_for_review.remove(question)
-        if current_member.not_attempted.filter(questionkey=queskey).exists():
-            current_member.not_attempted.remove(question)
-        if current_member.questions_attempted.filter(questionkey=queskey).exists():
-            current_member.questions_attempted.remove(question)
+# @csrf_exempt
+# def add_to_attempted(request):
+#     current_member = Member.objects.get(user=request.user)
+#     if request.method == "POST":
+#         queskey = request.POST.get("queskey")
+#         question = Question.objects.get(questionkey=queskey)
+#         # To make sure that a question does not appear in attempted and not attempted both.
+#         if current_member.marked_for_review.filter(questionkey=queskey).exists():
+#             current_member.marked_for_review.remove(question)
+#         if current_member.not_attempted.filter(questionkey=queskey).exists():
+#             current_member.not_attempted.remove(question)
+#         if current_member.ar_questions.filter(questionkey=queskey).exists():
+#             current_member.ar_questions.remove(question)
 
-        current_member.ar_questions.add(question)
+#         current_member.questions_attempted.add(question)
 
-        return HttpResponse(
-            "Question added to attempted"
-        )  # This needs to be changed later
-    else:
-        q = current_member.ar_questions.all()
-        arlist = []
-        for question in q:
-            arlist.append(question.questionkey)
-        data = {"arlist": arlist}
-        return JsonResponse(data)
+#         return HttpResponse(
+#             "Question added to attempted"
+#         )  # This needs to be changed later
+#     else:
+#         q = current_member.questions_attempted.all()
+#         atalist = []
+#         for question in q:
+#             atalist.append(question.questionkey)
+#         data = {"atalist": atalist}
+#         return JsonResponse(data)
+
+
+# @csrf_exempt
+# def add_to_ar(request):
+#     current_member = Member.objects.get(user=request.user)
+#     if request.method == "POST":
+#         queskey = request.POST.get("queskey")
+#         question = Question.objects.get(questionkey=queskey)
+#         # To make sure that a question does not appear in attempted and not attempted both.
+#         if current_member.marked_for_review.filter(questionkey=queskey).exists():
+#             current_member.marked_for_review.remove(question)
+#         if current_member.not_attempted.filter(questionkey=queskey).exists():
+#             current_member.not_attempted.remove(question)
+#         if current_member.questions_attempted.filter(questionkey=queskey).exists():
+#             current_member.questions_attempted.remove(question)
+
+#         current_member.ar_questions.add(question)
+
+#         return HttpResponse(
+#             "Question added to attempted"
+#         )  # This needs to be changed later
+#     else:
+#         q = current_member.ar_questions.all()
+#         arlist = []
+#         for question in q:
+#             arlist.append(question.questionkey)
+#         data = {"arlist": arlist}
+#         return JsonResponse(data)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-@csrf_exempt
-def get_no_of_questions(request):
-    no_of_questions = Question.objects.count()
+# @csrf_exempt
+# def get_no_of_questions(request):
+#     no_of_questions = Question.objects.count()
 
-    data = {"no_of_questions": no_of_questions}
-    return JsonResponse(data)
-
-
-@csrf_exempt
-def get_question_status(request):
-    current_member = Member.objects.get(user=request.user)
-    atrlist = []
-    atnalist = []
-    atalist = []
-    arlist = []
-
-    for question in current_member.marked_for_review.all():  # Add to review
-        atrlist.append(question.questionkey)
-    for question in current_member.not_attempted.all():  # Add to not_attempted
-        atnalist.append(question.questionkey)
-    for question in current_member.questions_attempted.all():  # Add to attempted
-        atalist.append(question.questionkey)
-    for question in current_member.ar_questions.all():  # Add to attempted and reviewed
-        arlist.append(question.questionkey)
-    x = int(Question.objects.count())
-
-    data = {
-        "reviewQues": atrlist,
-        "attemptedQues": atalist,
-        "unattemptedQues": atnalist,
-        "reviewAttemptedQues": arlist,
-        "numOfQuestions": x,
-    }
-    return JsonResponse(data)
+#     data = {"no_of_questions": no_of_questions}
+#     return JsonResponse(data)
 
 
-@csrf_exempt
-def delete_response(request):
-    current_member = Member.objects.get(user=request.user)
-    if request.method == "POST":
-        queskey = request.POST.get("queskey")
-        question = Question.objects.get(questionkey=queskey)
-        try:
-            response = Response.objects.filter(question=question, member=current_member)
-            response.delete()
-        except:
-            pass
+# @csrf_exempt
+# def get_question_status(request):
+#     current_member = Member.objects.get(user=request.user)
+#     atrlist = []
+#     atnalist = []
+#     atalist = []
+#     arlist = []
+
+#     for question in current_member.marked_for_review.all():  # Add to review
+#         atrlist.append(question.questionkey)
+#     for question in current_member.not_attempted.all():  # Add to not_attempted
+#         atnalist.append(question.questionkey)
+#     for question in current_member.questions_attempted.all():  # Add to attempted
+#         atalist.append(question.questionkey)
+#     for question in current_member.ar_questions.all():  # Add to attempted and reviewed
+#         arlist.append(question.questionkey)
+#     x = int(Question.objects.count())
+
+#     data = {
+#         "reviewQues": atrlist,
+#         "attemptedQues": atalist,
+#         "unattemptedQues": atnalist,
+#         "reviewAttemptedQues": arlist,
+#         "numOfQuestions": x,
+#     }
+#     return JsonResponse(data)
+
+
+# @csrf_exempt
+# def delete_response(request):
+#     current_member = Member.objects.get(user=request.user)
+#     if request.method == "POST":
+#         queskey = request.POST.get("queskey")
+#         question = Question.objects.get(questionkey=queskey)
+#         try:
+#             response = Response.objects.filter(question=question, member=current_member)
+#             response.delete()
+#         except:
+#             pass
 
 
 @csrf_exempt
