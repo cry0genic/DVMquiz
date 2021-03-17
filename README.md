@@ -1,5 +1,5 @@
 # DVMquizbuilder
-A quiz building app, built on Django 2.1.5, for APOGEE 2019 at BITS Pilani
+A quiz building app, built on Django 2.1.5, for APOGEE 2021 at BITS Pilani
 
 ### How to setup application - 
 1. Install pip - 
