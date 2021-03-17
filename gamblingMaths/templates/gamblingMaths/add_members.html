@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+{%load static%}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'GamblingMaths/css/frame.css' %}">
+    <link rel="stylesheet" href="{% static 'GamblingMaths/css/nav.css' %}">
+    <link rel="stylesheet" href="{% static 'GamblingMaths/css/add_members.css' %}">
+    <title>Quiz-Portal</title>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="event-title">
+            Gambling<span>Maths</span>
+        </div>
+        <div class="skip-button">
+            Skip
+        </div>
+    </div>
+    <div class="members-wrapper">
+        <h1>Would You like to have a Team Member?</h1>
+        <form name="member_details" action="javascript:addMember()">
+            Member's Name: <input type="text" name="member_name" required>
+            <br><br>
+            Member's Email: <input type="email" name="member_email" required>
+            <br>
+            <center><input type="submit" value="Add Member and Continue" class="add-button" onclick="addMember()"></center>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{% static 'GamblingMaths/js/add_members.js' %}"></script>
+</body>
+</html>
