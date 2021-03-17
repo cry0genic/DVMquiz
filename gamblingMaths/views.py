@@ -415,7 +415,7 @@ def submit(request):
                         )
                         current_member.answered_incorrectly.add(response.question)
                 current_member.save()
-            print('this function 2') #error in this fun
+            print('this function 2') #error in this func
             return redirect("/submitquiz")
             
             
