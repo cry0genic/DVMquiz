@@ -22,7 +22,7 @@ def generate_keys():
 
     y = random.randint(0, 11)
     while True:
-        z = random.randint(0, 11)
+        z = random.randint(0,11)
         if z == y:
             continue
         else:
@@ -332,37 +332,69 @@ def delete_response(request):
 
 
 @csrf_exempt
-# @login_required(login_url='/sign_in')
+#@login_required(login_url='/sign_in')
 def store_response(request):
     current_member = Member.objects.get(user=request.user)
-    if request.method == "POST":
+    if request.method == 'POST':
         queskey = request.POST.get("queskey")
-        question = Question.objects.get(questionkey=queskey)
+        pool = int(request.POST.get("pool"))
+        question = Question.objects.get(questionkey=queskey, pool=pool)
+        member_questions = question.related_mq_object.all()
+        current_member_question = member_questions.get(member=current_member)
+        uncertainty = current_member.uncertainty
+        score = current_member.score
+
         try:
             anskey = request.POST.get("anskey")
             answers = question.answers.all()
             answer = answers.get(key=anskey)
-            try:
-                a = Response.objects.filter(member=current_member, question=question)[0]
-                a.answer_mcq = answer
-                a.save()
-            except:
-                a = Response(
-                    member=current_member, question=question, answer_mcq=answer
-                )
-                a.save()
+            # try:
+            #     a = Response.objects.filter(member=current_member, question=question)[0]
+            #     a.answer_mcq = answer
+            #     a.save()
+            # except:
+            a = Response(member=current_member, question=question, answer_mcq=answer, answer_text='')
+            a.save()
+            change = (uncertainty * score)/100
+            print(change)
+            print(change%1)
+            if answer.is_correct:
+                if change%1:
+                    change=int(change)+1
+                current_member.score += int(change)
+                current_member.correct_answers += 1
+            else:
+                intermediate = current_member.score - int(change)
+                if intermediate%1:
+                    intermediate  = int(intermediate)+1
+                current_member.score = intermediate
+            current_member.save()
         except:
             answer = request.POST.get("answer")
-            try:
-                a = Response.objects.filter(member=current_member, question=question)[0]
-                a.answer_text = answer
-                a.save()
-            except:
-                a = Response(
-                    member=current_member, question=question, answer_text=answer
-                )
-                a.save()
-        return HttpResponse("Answer stored")
+            answer = answer.lower()
+            # try:
+            #     a = Response.objects.filter(member=current_member, question=question)[0]
+            #     a.answer_text = answer
+            #     a.save()
+            # except:
+            a = Response(member=current_member, question=question, answer_text=answer)
+            a.save()
+            change = (uncertainty * score)/100
+            if answer == question.answer.lower():
+                if change%1:
+                    change=int(change)+1
+                current_member.score += change
+                current_member.correct_answers += 1
+            else:
+                intermediate = current_member.score - change
+                if intermediate%1:
+                    intermediate  = int(intermediate)+1
+                current_member.score = intermediate
+            current_member.save()   
+
+        current_member_question.delete() #Just to make sure the user cannot go back to a question he's skipped/answered, no matter what.
+        submit_if_eliminated(request) #eliminate the user if his score becomes zero.
+    return HttpResponse("Answer stored")
 
 
 def get_leaderboard(request):
@@ -381,79 +413,47 @@ def get_leaderboard(request):
         return HttpResponse("IDK what to put here")
 
 
-@login_required(login_url="/sign_in")
+@login_required(login_url='sign_in/')
 def submit(request):
     current_member = Member.objects.get(user=request.user)
-
+    
     if current_member.submitted == False:
         current_member.submitted = True
         current_member.save()
-        try:
-            full_response = current_member.full_response.all()
-            for response in full_response:
-                question = response.question
-                try:
-                    if response.answer_mcq.is_correct:
-                        current_member.score = (
-                            current_member.score + question.score_increment
-                        )
-                        current_member.answered_correctly.add(response.question)
-                    else:
-                        current_member.score = (
-                            current_member.score - question.score_decrement
-                        )
-                        current_member.answered_incorrectly.add(response.question)
-                except:
-                    if response.answer_text == question.answer:
-                        current_member.score = (
-                            current_member.score + question.score_increment
-                        )
-                        current_member.answered_correctly.add(response.question)
-                    else:
-                        current_member.score = (
-                            current_member.score - question.score_decrement
-                        )
-                        current_member.answered_incorrectly.add(response.question)
-                current_member.save()
-            print('this function 2') #error in this func
-            return redirect("/submitquiz")
-            
-            
-        except:
-            return redirect("/leaderboard")
+        return redirect('/leaderboard/')
+        
     else:
-        return redirect("/leaderboard")
+        return redirect('/leaderboard/')
 
 
-@login_required(login_url="/sign_in")
+@login_required(login_url='sign_in/')
 def get_result(request):
     current_member = Member.objects.get(user=request.user)
     if current_member.submitted:
         name = current_member.name
-        correct = current_member.answered_correctly.all().count()
-        incorrect = current_member.answered_incorrectly.all().count()
-        unattempted = Question.objects.all().count() - correct - incorrect
+        correct = current_member.correct_answers
+        incorrect = 10 - correct
         score = current_member.score
 
-        leaderboard = Member.objects.filter(submitted=True).order_by("-score")
+        leaderboard = Member.objects.filter(submitted = True).order_by('-score')
         rank = 1
         for member in leaderboard:
             if not member == current_member:
                 rank = rank + 1
             else:
                 break
-
+        
         data = {
-            "name": name,
-            "correct": correct,
-            "incorrect": incorrect,
-            "unattempted": unattempted,
-            "rank": rank,
-            "score": score,
+            'name':name,
+            'correct':correct,
+            'incorrect':incorrect,
+            'rank':rank,
+            'score':score
         }
         return JsonResponse(data)
     else:
         return HttpResponse("You think you're smart?")
+
 
 
 @login_required(login_url="/sign_in")
@@ -466,30 +466,15 @@ def get_score(request):
         return HttpResponse("The user needs to submit first")
 
 
-# @login_required(login_url='/sign_in')
-def get_question(request, queskey):
+@csrf_exempt
+@login_required(login_url='/sign_in')
+def get_question(request, pool):
     current_member = Member.objects.get(user=request.user)
-    current_question = Question.objects.get(questionkey=queskey)
-    marked_key = 100
-    entered_answer = ""
-    try:
-        response = Response.objects.filter(
-            member=current_member, question=current_question
-        )[0]
-        marked_key = response.answer_mcq.key
-    except:
-        pass
-
-    try:
-        response = Response.objects.filter(
-            member=current_member, question=current_question
-        )[0]
-        entered_answer = response.answer_text
-    except:
-        pass
-
+    question_data = MemberQuestion.objects.filter(pool=int(pool), member = current_member)[0] #Choose a question using the MemberQuestion model.
+    current_question = question_data.question
+    
     if current_question.is_image:
-        base = settings.MEDIA_ROOT
+        base = settings.MEDIA_ROOT #Dunno why this is here. Not removing this.
         media = os.path.abspath(os.path.join(base, os.pardir))
         image_url = current_question.image.url
     else:
@@ -502,22 +487,27 @@ def get_question(request, queskey):
             answerlist.append(answer.content)
             keylist.append(answer.key)
         data = {
-            "question": current_question.content,
-            "answers": answerlist,
-            "keys": keylist,
-            "mcq_flag": True,
-            "image_flag": current_question.is_image,
-            "marked_answer": marked_key,
-            "image_url": image_url,
+            "question":current_question.content,
+            "answers":answerlist,
+            "keys":keylist,
+            "mcq_flag":True,
+            "ques_key":current_question.questionkey,
+            "image_flag":current_question.is_image,
+            # "marked_answer":marked_key,
+            "image_url": image_url
         }
         return JsonResponse(data)
     else:
         data = {
-            "question": current_question.content,
-            "mcq_flag": False,
-            "entered_answer": entered_answer,
+            "question":current_question.content,
+            "mcq_flag":False,
+            "ques_key":current_question.questionkey,
+            "image_flag": current_question.is_image,
+            "image_url":image_url
         }
         return JsonResponse(data)
+
+
 
 
 @csrf_exempt
@@ -538,13 +528,13 @@ def get_time_remaining(request):
     else:
 
         start_time = current_member.start_time
-        quiz_time = datetime.timedelta(minutes=30)
+        quiz_time = datetime.timedelta(minutes=10)
         end_time = start_time + quiz_time
         time_remaining = end_time - datetime.datetime.now(
             timezone.utc
         )  # A datetime.timedelta object
 
-        if time_remaining.seconds > 1800 or time_remaining.seconds < 0:
+        if time_remaining.seconds > 600 or time_remaining.seconds < 0:
 
             data = {"message": "Time is out of range"}
             return JsonResponse(data)
@@ -569,34 +559,45 @@ def get_ques_attempted(request):
     return JsonResponse(data)
 
 
-@staff_member_required
-def add_question(request):
-    if request.method == "POST":
-        form = AddQuestion(request.POST)
-        if form.is_valid():
-            ques_content = form.cleaned_data.get("question_content")
-            key = form.cleaned_data.get("question_key")
-            question = Question(questionkey=key, content=ques_content, is_mcq=True)
-            question.save()
-            question = Question.objects.get(questionkey=key)
+# @staff_member_required
+# def add_question(request):
+#     if request.method == "POST":
+#         form = AddQuestion(request.POST)
+#         if form.is_valid():
+#             ques_content = form.cleaned_data.get("question_content")
+#             key = form.cleaned_data.get("question_key")
+#             question = Question(questionkey=key, content=ques_content, is_mcq=True)
+#             question.save()
+#             question = Question.objects.get(questionkey=key)
 
-            for i in range(4):
-                content = form.cleaned_data.get("option_" + str(i + 1))
-                answer = Answer(parent_question=question, content=content, key=i + 1)
-                answer.save()
+#             for i in range(4):
+#                 content = form.cleaned_data.get("option_" + str(i + 1))
+#                 answer = Answer(parent_question=question, content=content, key=i + 1)
+#                 answer.save()
 
-            true_key = form.cleaned_data.get("true_option")
-            answer = question.answers.get(key=true_key)
-            answer.is_correct = True
-            answer.save()
-            return redirect("/add_question")
-        else:
-            return HttpResponse("Please check the data you have entered")
-    else:
-        form = AddQuestion()
-        set_key = len(Question.objects.all())
-        return render(
-            request,
-            "gamblingMaths/add_question.html",
-            {"form": form, "newkey": set_key},
-        )
+#             true_key = form.cleaned_data.get("true_option")
+#             answer = question.answers.get(key=true_key)
+#             answer.is_correct = True
+#             answer.save()
+#             return redirect("/add_question")
+#         else:
+#             return HttpResponse("Please check the data you have entered")
+#     else:
+#         form = AddQuestion()
+#         set_key = len(Question.objects.all())
+#         return render(
+#             request,
+#             "gamblingMaths/add_question.html",
+#             {"form": form, "newkey": set_key},
+#         )
+
+
+def hello(request):
+    '''
+    Very poor code. 
+    NOT RECOMMENDED 
+    EVER
+    '''
+    print('hello')
+    settings.LOGIN_REDIRECT_URL = request.GET['url']
+    return HttpResponse('hello')
