@@ -39,11 +39,11 @@ def instructions(request):
     return render(request, "gamblingMaths/instruction.html")
 
 
-@login_required(login_url="/sign_in")
+@login_required(login_url="/quizbuilder/sign_in")
 def index(request):
     current_member = Member.objects.get(user=request.user)
     if current_member.submitted:
-        return redirect("/leaderboard")
+        return redirect("/quizbuilder/leaderboard")
     else:
         return render(request, "gamblingMaths/index.html")
 
@@ -52,7 +52,7 @@ def sign_in(request):
     if request.user.is_anonymous:
         return render(request, "gamblingMaths/sign_in.html")
     else:
-        return redirect("/")
+        return redirect("/quizbuilder/")
 
 
 # ------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ def create_member(request):
     name = user.first_name + " " + user.last_name
     if Member.objects.filter(user=user).exists():
         return redirect(
-            "/instructions"
+            "/quizbuilder/instructions"
         )  # Redirect to wherever you want the user to go to after logging in.
     else:
         name = user.first_name + " " + user.last_name
@@ -134,16 +134,16 @@ def submit_if_eliminated(request):
 
     if current_member.is_eliminated:
         
-        return redirect("/submitquiz")
+        return redirect("/quizbuilder/submitquiz")
     else:
         pass
 
 
-@login_required(login_url="/sign_in")
+@login_required(login_url="/quizbuilder/sign_in")
 def sign_out(request):
     submit(request)
     logout(request)
-    return redirect("/sign_in")
+    return redirect("/quizbuilder/sign_in")
 
 @csrf_exempt
 @login_required
@@ -413,20 +413,20 @@ def get_leaderboard(request):
         return HttpResponse("IDK what to put here")
 
 
-@login_required(login_url='sign_in/')
+@login_required(login_url='/quizbuilder/sign_in/')
 def submit(request):
     current_member = Member.objects.get(user=request.user)
     
     if current_member.submitted == False:
         current_member.submitted = True
         current_member.save()
-        return redirect('/leaderboard/')
+        return redirect('/quizbuilder/leaderboard/')
         
     else:
-        return redirect('/leaderboard/')
+        return redirect('/quizbuilder/leaderboard/')
 
 
-@login_required(login_url='sign_in/')
+@login_required(login_url='/quizbuilder/sign_in/')
 def get_result(request):
     current_member = Member.objects.get(user=request.user)
     if current_member.submitted:
@@ -456,7 +456,7 @@ def get_result(request):
 
 
 
-@login_required(login_url="/sign_in")
+@login_required(login_url="/quizbuilder/sign_in")
 def get_score(request):
     current_member = Member.objects.get(user=request.user)
     if current_member.submitted:
@@ -467,7 +467,7 @@ def get_score(request):
 
 
 @csrf_exempt
-@login_required(login_url='/sign_in')
+@login_required(login_url='/quizbuilder/sign_in')
 def get_question(request, pool):
     current_member = Member.objects.get(user=request.user)
     question_data = MemberQuestion.objects.filter(pool=int(pool), member = current_member)[0] #Choose a question using the MemberQuestion model.

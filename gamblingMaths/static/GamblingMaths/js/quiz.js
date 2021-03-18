@@ -22,7 +22,7 @@ var numOfQuestions = 10;
 function getTime() {
   var data = $.ajax({
     type: "GET",
-    url: `/get_time_remaining`,
+    url: `/quizbuilder/get_time_remaining`,
     data: {},
     success: function(data) {
       var obj = JSON.parse;
@@ -32,7 +32,7 @@ function getTime() {
         var seconds = parseInt(time % 60);
         setTimer(minutes, seconds);
       } else {
-        window.open("/submitquiz/", "_self");
+        window.open("/quizbuilder/submitquiz/", "_self");
       }
     }
   });
@@ -104,7 +104,7 @@ function setTimer(maxtime_min, secondsLeft) {
 
   function timeout() {
     clearInterval(timer_interval);
-    window.open("/submitquiz/", "_self");
+    window.open("/quizbuilder/submitquiz/", "_self");
   }
 }
 
@@ -140,7 +140,7 @@ getCurrentQuestionNo();
 function getCurrentQuestionNo() {
   var data = $.ajax({
     type: "GET",
-    url: `/get_ques_attempted`,
+    url: `/quizbuilder/get_ques_attempted`,
     data: {},
     success: function(data) {
       questionNo = data.ques_attempted;
@@ -160,7 +160,7 @@ function getQuestion(quesNo) {
 
   var data = $.ajax({
     type: "GET",
-    url: `/get_question/${pool}`,
+    url: `/quizbuilder/get_question/${pool}`,
     data: {},
     success: function(data) {
       // console.log(data);
@@ -252,7 +252,7 @@ function sendAnswer(quesNo, key, poolNo) {
   if (is_mcq) {
     var data = $.ajax({
       type: "POST",
-      url: `/store_response/`,
+      url: `/quizbuilder/store_response/`,
       data: {
         "queskey" : quesNo,
         "anskey" : key,
@@ -266,7 +266,7 @@ function sendAnswer(quesNo, key, poolNo) {
   } else {
     var data = $.ajax({
       type: "POST",
-      url: `/store_response/`,
+      url: `/quizbuilder/store_response/`,
       data: {
         "queskey": quesNo,
         "answer": key,
@@ -609,7 +609,7 @@ function clear_response() {
 
 function submitQuiz() {
     doSave_next();
-    window.open("/submitquiz", "_self");
+    window.open("/quizbuilder/submitquiz", "_self");
 }
 
 function askMarks() {
@@ -626,7 +626,7 @@ function sendMarks() {
   if (marks >= 10 && marks <= 90) {
     var data = $.ajax({
       type: "POST",
-      url: "/set_uncertainty/",
+      url: "/quizbuilder/set_uncertainty/",
       data: {
         "uncertainty": marks
       },

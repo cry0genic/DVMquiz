@@ -19,7 +19,7 @@ document.querySelector(".leaderboard").addEventListener("click", () => {
 function getOverview(){
     var data = $.ajax( {
         type: 'GET',
-        url: `/get_result`,
+        url: `/quizbuilder/get_result`,
         data: {
         },
         
@@ -39,7 +39,7 @@ function getOverview(){
 function getLeaderboard(){
     var data = $.ajax( {
         type: 'GET',
-        url: `/get_leaderboard`,
+        url: `/quizbuilder/get_leaderboard`,
         data: {
         },
         

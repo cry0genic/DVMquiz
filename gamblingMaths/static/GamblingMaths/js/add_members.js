@@ -1,7 +1,7 @@
 function createQuestions() {
     var data = $.ajax( {
         type: 'POST',
-        url: `/generate_questions/`,
+        url: `/quizbuilder/generate_questions/`,
         data: {
         },
         success: function(data) {  
@@ -12,7 +12,7 @@ function createQuestions() {
 
 document.getElementsByClassName("skip-button")[0].addEventListener("click", function() {
     createQuestions();
-    location.href = "/instructions";
+    location.href = "/quizbuilder/instructions";
 });
 
 function addMember() {
@@ -21,7 +21,7 @@ function addMember() {
         var email = document.member_details.member_email.value;
         var data = $.ajax( {
             type: 'POST',
-            url: `/add_team_member/`,
+            url: `/quizbuilder/add_team_member/`,
             data: {
                 "team_member_name" : name,
                 "team_member_email" : email
@@ -32,7 +32,7 @@ function addMember() {
                     alert("Email already exists");}
                 else{
                     createQuestions();
-                    location.href = "/instructions";
+                    location.href = "/quizbuilder/instructions";
                 }
                 
             }
