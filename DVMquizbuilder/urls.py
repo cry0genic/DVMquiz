@@ -22,9 +22,9 @@ from django.views.static import serve
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('gamblingMaths.urls')),
-    url(r'^accounts/', include('allauth.urls')),
+    path('quizbuilder/admin/', admin.site.urls),
+    path('quizbuilder/', include('gamblingMaths.urls')),
+    url(r'^quizbuilder/accounts/', include('allauth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += staticfiles_urlpatterns()
