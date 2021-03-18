@@ -5,7 +5,7 @@ var numOfQuestions = 10;
 // function getNoOfQuestions(){
 //     var data = $.ajax( {
 //         type: 'GET',
-//         url: `/quiz-portal/gamblingMaths/get_no_of_questions`,
+//         url: `/gamblingMaths/get_no_of_questions`,
 //         data: {
 //         },
 //         success: function(data){
@@ -46,7 +46,7 @@ var is_mcq;
 // function getQuestionStatus(){
 //     var data = $.ajax( {
 //         type: 'GET',
-//         url: `/quiz-portal/gamblingMaths/gqs`,
+//         url: `/gamblingMaths/gqs`,
 //         data: {
 //         },
 
@@ -135,6 +135,7 @@ function setTimer(maxtime_min, secondsLeft) {
 //     getQuestion(quesNo);
 //     askMarks();
 // }
+
 getCurrentQuestionNo();
 function getCurrentQuestionNo() {
   var data = $.ajax({
@@ -367,7 +368,7 @@ function doSave_next() {
 // function sendAnswer_Review(quesNo, key){
 //     var data = $.ajax( {
 //         type: 'POST',
-//         url: '/quiz-portal/gamblingMaths/atar/',
+//         url: '/gamblingMaths/atar/',
 //         data: {
 //             "queskey" : quesNo,
 //             "anskey" : key
@@ -380,7 +381,7 @@ function doSave_next() {
 // function sendReview(quesNo){
 //     var data = $.ajax( {
 //         type: 'POST',
-//         url: '/quiz-portal/gamblingMaths/atr/',
+//         url: '/gamblingMaths/atr/',
 //         data: {
 //             "queskey" : quesNo
 //         },
@@ -392,7 +393,7 @@ function doSave_next() {
 // function sendAttempted(quesNo) {
 //   var data = $.ajax({
 //     type: "POST",
-//     url: "/quiz-portal/gamblingMaths/ata/",
+//     url: "/gamblingMaths/ata/",
 //     data: {
 //       queskey: quesNo
 //     },
@@ -402,7 +403,7 @@ function doSave_next() {
 // function sendUnattempted(quesNo) {
 //   var data = $.ajax({
 //     type: "POST",
-//     url: "/quiz-portal/gamblingMaths/atna/",
+//     url: "/gamblingMaths/atna/",
 //     data: {
 //       queskey: quesNo
 //     },
@@ -580,7 +581,7 @@ function clear_response() {
 // function sendClearResponse(quesNo){
 //     var data = $.ajax( {
 //         type: 'POST',
-//         url: '/quiz-portal/gamblingMaths/delete_response/',
+//         url: '/gamblingMaths/delete_response/',
 //         data: {
 //             "queskey" : quesNo
 //         },
@@ -594,7 +595,7 @@ function clear_response() {
 //   var noUnattempt = document.getElementById("unattempted");
 //   var data = $.ajax({
 //     type: "GET",
-//     url: `/quiz-portal/gamblingMaths/gqs`,
+//     url: `/gamblingMaths/gqs`,
 //     data: {},
 
 //     success: function(data) {
