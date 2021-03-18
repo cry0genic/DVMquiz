@@ -39,7 +39,7 @@ def instructions(request):
     return render(request, "gamblingMaths/instruction.html")
 
 
-@login_required(login_url="quizbuilder/sign_in")
+@login_required(login_url="/sign_in")
 def index(request):
     current_member = Member.objects.get(user=request.user)
     if current_member.submitted:
