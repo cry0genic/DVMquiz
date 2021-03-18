@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Member, Question, Answer, Response
+from .models import Member, Question, Answer, Response, MemberQuestion
 from django.contrib.auth.models import Group
 
 # class AnswerInline(admin.StackedInline):
@@ -16,3 +16,4 @@ admin.site.register(Member)
 admin.site.register(Question)
 admin.site.register(Answer)
 admin.site.register(Response)
+admin.site.register(MemberQuestion)
